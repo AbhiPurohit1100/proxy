@@ -2,12 +2,10 @@ const express = require('express');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 const app = express();
 
-
 const targetUrl = 'https://api.backpack.exchange';
 
-// CORS middleware
 app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*'); // For production, set this to your frontend domain
+    res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     res.header('Access-Control-Allow-Credentials', 'true');
@@ -18,22 +16,23 @@ app.use((req, res, next) => {
     next();
 });
 
-// Proxy middleware
-// app.use('/tickers', createProxyMiddleware({
-//     target: targetUrl,
-//     changeOrigin: true,
-//     pathRewrite: {
-//         '^/tickers': '/tickers',
-//     }
-// }));
-
-// Proxy all API requests to the target
 app.use('/', createProxyMiddleware({
     target: targetUrl,
     changeOrigin: true,
+    onProxyReq: (proxyReq, req, res) => {
+        // Forward user-agent and origin headers if present
+        if (req.headers['user-agent']) {
+            proxyReq.setHeader('user-agent', req.headers['user-agent']);
+        }
+        if (req.headers['origin']) {
+            proxyReq.setHeader('origin', req.headers['origin']);
+        }
+    },
+    onProxyRes: (proxyRes, req, res) => {
+        // You can add logging or custom logic here if needed
+    }
 }));
 
-// Use process.env.PORT for deployment compatibility
 const port = process.env.PORT || 3001;
 app.listen(port, () => {
     console.log(`Proxy server running on http://localhost:${port}`);
