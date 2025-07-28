@@ -19,11 +19,20 @@ app.use((req, res, next) => {
 });
 
 // Proxy middleware
-app.use('/tickers', createProxyMiddleware({
+// app.use('/tickers', createProxyMiddleware({
+//     target: targetUrl,
+//     changeOrigin: true,
+//     pathRewrite: {
+//         '^/tickers': '/tickers',
+//     }
+// }));
+
+// Proxy all /api/v1/* requests
+app.use('/api/v1', createProxyMiddleware({
     target: targetUrl,
     changeOrigin: true,
     pathRewrite: {
-        '^/tickers': '/tickers',
+        '^/api/v1': '', // removes /api/v1 from the path
     }
 }));
 
