@@ -19,11 +19,11 @@ app.use((req, res, next) => {
 });
 
 // Proxy middleware
-app.use('/', createProxyMiddleware({
+app.use('/tickers', createProxyMiddleware({
     target: targetUrl,
     changeOrigin: true,
     pathRewrite: {
-        '^/': '/', // keep as is, but you can adjust if needed
+        '^/tickers': '/tickers',
     }
 }));
 
