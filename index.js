@@ -27,13 +27,10 @@ app.use((req, res, next) => {
 //     }
 // }));
 
-// Proxy all /api/v1/* requests
-app.use('/api/v1', createProxyMiddleware({
+// Proxy all API requests to the target
+app.use('/', createProxyMiddleware({
     target: targetUrl,
     changeOrigin: true,
-    pathRewrite: {
-        '^/api/v1': '', // removes /api/v1 from the path
-    }
 }));
 
 // Use process.env.PORT for deployment compatibility
