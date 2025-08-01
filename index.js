@@ -4,32 +4,36 @@ const app = express();
 
 const targetUrl = 'https://api.backpack.exchange';
 
+
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     res.header('Access-Control-Allow-Credentials', 'true');
     res.header('Access-Control-Expose-Headers', 'Content-Length, Content-Range');
+
     if (req.method === 'OPTIONS') {
         return res.sendStatus(200);
     }
+
     next();
 });
 
+// Setup proxy
 app.use('/', createProxyMiddleware({
     target: targetUrl,
     changeOrigin: true,
     onProxyReq: (proxyReq, req, res) => {
-        // Forward user-agent and origin headers if present
+        
         if (req.headers['user-agent']) {
             proxyReq.setHeader('user-agent', req.headers['user-agent']);
         }
-        if (req.headers['origin']) {
-            proxyReq.setHeader('origin', req.headers['origin']);
-        }
+
+        
+        proxyReq.removeHeader('origin');
     },
     onProxyRes: (proxyRes, req, res) => {
-        // You can add logging or custom logic here if needed
+        // Optional logging
     }
 }));
 
